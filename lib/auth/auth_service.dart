@@ -35,7 +35,7 @@ class AuthService {
 
       // Hash the password before saving
       String hashedPassword = _hashPassword(password);
-
+      String role = "User";
       // Save user details to Firestore
       await _firestore.collection('users').add({
         'email': email,
@@ -43,7 +43,7 @@ class AuthService {
         'firstname': firstname,
         'lastname': lastname,
         'password': hashedPassword,
-        'role': 'User'
+        'role': role,
       });
 
       return true;
@@ -106,6 +106,7 @@ class AuthService {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('userId', userDoc.id);
           await prefs.setBool('isFirstTime', false);
+          await prefs.setString('role', userDoc['role']);
 
           return {
             'userId': userDoc.id,
@@ -152,6 +153,7 @@ class AuthService {
         'name': 'Guest',
         'email': 'No Email',
         'username': 'No Username',
+        'role': 'User'
       };
     }
   }
@@ -160,16 +162,8 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
 
-    if (userId != null) {
-      // Retrieve user information from Firestore using the userId
-      return await getUserProfileInfo(userId);
-    } else {
-      return {
-        'name': 'Guest',
-        'email': 'No Email',
-        'username': 'No Username',
-      };
-    }
+    // Retrieve user information from Firestore using the userId
+    return await getUserProfileInfo(userId!);
   }
 
   void displayUserInfo() async {
@@ -178,6 +172,7 @@ class AuthService {
     log('Name: ${userInfo['name']}');
     log('Email: ${userInfo['email']}');
     log('Username: ${userInfo['username']}');
+    log('Role: ${userInfo['role']}');
   }
 
   // Logout user

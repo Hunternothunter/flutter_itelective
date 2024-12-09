@@ -1,6 +1,4 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_itelective/auth/login.dart';
 import 'package:flutter_itelective/models/course.dart';
 import 'package:flutter_itelective/database/course_service.dart';
 import 'package:flutter_itelective/pages/course_detail.dart';
@@ -30,19 +28,11 @@ class _EnrolledCoursesState extends State<EnrolledCourses> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? loadedUserId = prefs.getString('userId');
 
-    if (loadedUserId != null) {
-      setState(() {
-        userId = loadedUserId;
-        _enrolledCourses = CourseService().getEnrolledCourses(userId);
-      });
-    } else {
-      log("No userId found in SharedPreferences.");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
+    setState(() {
+      userId = loadedUserId!;
+      _enrolledCourses = CourseService().getEnrolledCourses(userId);
+    });
     }
-  }
 
   Future<void> _refreshEnrolledCourses() async {
     setState(() {

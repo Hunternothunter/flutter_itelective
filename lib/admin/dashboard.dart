@@ -1,6 +1,11 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_itelective/admin/students.dart';
+import 'package:flutter_itelective/pages/course_list.dart';
+import 'package:flutter_itelective/pages/enrolled_courses.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -25,11 +30,11 @@ class _DashboardState extends State<Dashboard> {
 
   // Fetch actual data from Firebase Firestore
   Future<void> fetchAnalyticsData() async {
-    // var usersData = await FirebaseFirestore.instance.collection('users').get();
-    // var coursesData =
-    //     await FirebaseFirestore.instance.collection('courses').get();
-    // var enrollmentsData =
-    //     await FirebaseFirestore.instance.collection("enrollments").get();
+    var usersData = await FirebaseFirestore.instance.collection('users').get();
+    var coursesData =
+        await FirebaseFirestore.instance.collection('courses').get();
+    var enrollmentsData =
+        await FirebaseFirestore.instance.collection("enrollments").get();
 
     // // Fetch historical data for the graphs (just an example)
     // var userGrowthSnapshot =
@@ -37,17 +42,21 @@ class _DashboardState extends State<Dashboard> {
     // var courseGrowthSnapshot =
     //     await FirebaseFirestore.instance.collection('course_growth').get();
 
-    setState(() {
-      // totalUsers = usersData.docs.length;
-      // totalCourses = coursesData.docs.length;
-      // totalEnrollments = enrollmentsData.docs.length; // Set total enrollments
+    try {
+      setState(() {
+        totalUsers = usersData.docs.length;
+        totalCourses = coursesData.docs.length;
+        totalEnrollments = enrollmentsData.docs.length; // Set total enrollments
 
-      // // Map the growth data into lists for the graphs
-      // userGrowthData =
-      //     userGrowthSnapshot.docs.map((doc) => doc['count'] as int).toList();
-      // courseGrowthData =
-      //     courseGrowthSnapshot.docs.map((doc) => doc['count'] as int).toList();
-    });
+        // // Map the growth data into lists for the graphs
+        // userGrowthData =
+        //     userGrowthSnapshot.docs.map((doc) => doc['count'] as int).toList();
+        // courseGrowthData =
+        //     courseGrowthSnapshot.docs.map((doc) => doc['count'] as int).toList();
+      });
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   @override
@@ -63,13 +72,35 @@ class _DashboardState extends State<Dashboard> {
               GridView.count(
                 shrinkWrap: true,
                 crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
                 children: [
-                  _buildStatCard('Users', totalUsers, Icons.people),
-                  _buildStatCard('Courses', totalCourses, Icons.book),
                   _buildStatCard(
-                      'Enrolled Students', totalEnrollments, Icons.school),
+                    'Users',
+                    totalUsers,
+                    Icons.people,
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => StudentLists()),
+                      );
+                    },
+                  ),
+                  _buildStatCard(
+                    'Courses',
+                    totalCourses,
+                    Icons.book,
+                    () {
+                    },
+                  ),
+                  _buildStatCard(
+                    'Enrolled Students',
+                    totalEnrollments,
+                    Icons.school,
+                    () {
+                      
+                    },
+                  ),
                 ],
               ),
               SizedBox(height: 16),
@@ -89,40 +120,43 @@ class _DashboardState extends State<Dashboard> {
   }
 
   // Helper method to build a statistics card with an icon, number, and text
-  Widget _buildStatCard(String title, int count, IconData icon) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 50,
-              color: Colors.blueAccent,
-            ),
-            SizedBox(height: 10),
-            Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+  Widget _buildStatCard(
+      String title, int count, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 50,
                 color: Colors.blueAccent,
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 10),
+              Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
               ),
-            ),
-          ],
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

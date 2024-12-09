@@ -50,18 +50,11 @@ class _EnrollCourseState extends State<EnrollCourse> {
         final prefs = await SharedPreferences.getInstance();
         String? userId = prefs.getString('userId');
 
-        if (userId == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('User not logged in')),
-          );
-          return;
-        }
-
         String courseId =
             _courses.firstWhere((course) => course.title == _selectedCourse).id;
 
         bool success =
-            await CourseService().enrollInCourse(userId, courseId, context);
+            await CourseService().enrollInCourse(userId!, courseId, context);
 
         if (success) {
           setState(() {

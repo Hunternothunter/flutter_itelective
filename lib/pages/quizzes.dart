@@ -35,28 +35,31 @@ class _QuizzesState extends State<Quizzes> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
 
-    if (userId != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
 
-      if (userDoc.exists && userDoc['role'] == 'administrator') {
-        setState(() {
-          isAdmin = true; // User is an administrator
-        });
-      }
+    if (userDoc.exists && userDoc['role'] == 'administrator') {
+      setState(() {
+        isAdmin = true; // User is an administrator
+      });
     }
   }
 
   // Fetch quizzes from Firestore
   Future<void> _fetchQuizzes() async {
-    QuerySnapshot quizSnapshot =
-        await FirebaseFirestore.instance.collection('quizzes').get();
+    try {
+      QuerySnapshot quizSnapshot =
+          await FirebaseFirestore.instance.collection('quizzes').get();
 
-    setState(() {
-      quizzes = quizSnapshot.docs;
-    });
+      if (mounted) {
+        setState(() {
+          quizzes = quizSnapshot.docs;
+        });
+      }
+    } catch (e) {
+      // Handle any errors
+      log('Error fetching quizzes: $e');
+    }
   }
 
   // Function for 'Add' action
@@ -89,7 +92,23 @@ class _QuizzesState extends State<Quizzes> {
       // Fetch updated quizzes
       _fetchQuizzes();
     } else {
-      print("Please fill in all fields.");
+      showDialog(
+        context: context, 
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: const Text("Error", style: TextStyle(color: Colors.red),),
+            content: const Text("Please fill in all fields."),
+            actions: [
+              TextButton(
+                onPressed: (){
+                  Navigator.pop(context);
+                }, 
+                child: Text("Okay")
+              ),
+            ],
+          );
+        } 
+      );
     }
   }
 
@@ -165,7 +184,7 @@ class _QuizzesState extends State<Quizzes> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Quizzes"),
+        title: const Text("Quizzes Questions"),
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,

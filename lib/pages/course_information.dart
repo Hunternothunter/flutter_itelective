@@ -31,25 +31,23 @@ class _CourseInformationState extends State<CourseInformation> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
 
-    if (userId != null) {
-      List<Course> enrolledCourses =
-          await _courseService.getEnrolledCourses(userId);
-      setState(() {
-        _course = course;
-        _isEnrolled = enrolledCourses
-            .any((c) => c.id == course.id); // Check if user is enrolled
-      });
+    List<Course> enrolledCourses =
+        await _courseService.getEnrolledCourses(userId!);
+    setState(() {
+      _course = course;
+      _isEnrolled = enrolledCourses
+          .any((c) => c.id == course.id); // Check if user is enrolled
+    });
     }
-  }
 
   // Enroll the user in the course
   Future<void> _enrollInCourse() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
 
-    if (userId != null && _course != null) {
+    if (_course != null) {
       bool success =
-          await _courseService.enrollInCourse(userId, _course!.id, context);
+          await _courseService.enrollInCourse(userId!, _course!.id, context);
       if (success) {
         setState(() {
           _isEnrolled = true; // Update enrollment status

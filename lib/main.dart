@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_itelective/pages/course_intro.dart';
 import 'package:flutter_itelective/pages/home.dart';
-import 'package:flutter_itelective/admin/admin_home.dart'; // Import AdminHome
+import 'package:flutter_itelective/admin/admin_home.dart';
 import 'package:flutter_itelective/auth/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -99,11 +99,6 @@ class _SplashScreenState extends State<SplashScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? userId = prefs.getString('userId');
 
-      // If no user ID is stored, user is not logged in
-      if (userId == null) {
-        return false;
-      }
-
       // Query Firestore to check if the user exists
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
@@ -128,10 +123,6 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? userId = prefs.getString('userId');
-
-      if (userId == null) {
-        return null; // No user ID found, return null
-      }
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')

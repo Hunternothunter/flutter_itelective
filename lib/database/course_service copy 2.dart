@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/course.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CourseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,7 +36,7 @@ class CourseService {
     return courses;
   }
 
-  // Fetch a single course by its ID
+    // Fetch a single course by its ID
   Future<Course> fetchCourseById(String courseId) async {
     try {
       DocumentSnapshot docSnapshot =
@@ -159,18 +159,6 @@ class CourseService {
       log("Error enrolling in course: $e");
       _showMessage("Error enrolling in course: $e", context);
       return false;
-    }
-  }
-
-  /// Delete a course by its ID
-  Future<void> deleteCourse(String courseId) async {
-    try {
-      // Delete the course from Firestore
-      await _firestore.collection('courses').doc(courseId).delete();
-      log("Course $courseId deleted successfully");
-    } catch (e) {
-      log("Error deleting course: $e");
-      rethrow; // Rethrow error to handle it elsewhere if needed
     }
   }
 
